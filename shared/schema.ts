@@ -23,7 +23,11 @@ export const jobs = pgTable("jobs", {
 });
 
 export const insertUserSchema = createInsertSchema(users).omit({ id: true });
-export const insertJobSchema = createInsertSchema(jobs).omit({ id: true, createdAt: true });
+export const insertJobSchema = createInsertSchema(jobs).extend({
+    customerName: z.string().min(2, { message: "Customer name must be at least 2 characters" }),
+    regNumber: z.string().min(4, { message: "Registration number must be at least 4 characters" }),
+    serviceType: z.string({ required_error: "Please select a service type" }).min(1, { message: "Please select a service type" }),
+}).omit({ id: true, createdAt: true });
 
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;

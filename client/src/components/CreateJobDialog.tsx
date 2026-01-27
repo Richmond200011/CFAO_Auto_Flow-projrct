@@ -1,3 +1,4 @@
+import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertJobSchema, type InsertJob } from "@shared/schema";
@@ -28,6 +29,7 @@ import { Loader2, Plus } from "lucide-react";
 export function CreateJobDialog() {
   const [open, setOpen] = useState(false);
   const { mutate, isPending } = useCreateJob();
+  const { toast } = useToast();
   
   const form = useForm<InsertJob>({
     resolver: zodResolver(insertJobSchema),
@@ -54,6 +56,17 @@ export function CreateJobDialog() {
       onSuccess: () => {
         setOpen(false);
         form.reset();
+        toast({
+          title: "Job Created",
+          description: `Job for ${payload.regNumber} has been successfully created.`,
+        });
+      },
+      onError: (error) => {
+        toast({
+          title: "Error creating job",
+          description: error.message,
+          variant: "destructive",
+        });
       },
     });
   }
