@@ -19,7 +19,7 @@ export default function AuthPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("https://58f193b812d7.ngrok-free.app/api/login", {
+      const response = await fetch("https://58f193b812d7.ngrok-free.app/api/v1/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -1,36 +1,89 @@
 import { z } from 'zod';
-import { insertJobSchema, jobs } from './schema';
+import { insertJobSchema } from './schema';
 
 export const api = {
-  jobs: {
-    list: {
-      method: 'GET' as const,
-      path: '/api/jobs',
-      responses: {
-        200: z.array(z.custom<typeof jobs.$inferSelect>()),
-      },
-    },
-    create: {
+  auth: {
+    login: {
       method: 'POST' as const,
-      path: '/api/jobs',
-      input: insertJobSchema,
+      path: '/api/v1/auth/login',
+      input: z.object({
+        username: z.string(),
+        password: z.string(),
+      }),
       responses: {
-        201: z.custom<typeof jobs.$inferSelect>(),
+        200: z.object({
+          id: z.number(),
+          username: z.string(),
+          branch: z.string(),
+          role: z.string(),
+        }),
       },
     },
-    update: {
-      method: 'PATCH' as const,
-      path: '/api/jobs/:id',
-      input: insertJobSchema.partial(),
-      responses: {
-        200: z.custom<typeof jobs.$inferSelect>(),
+  },
+  services: {
+    cards: {
+      list: {
+        method: 'GET' as const,
+        path: '/api/v1/services/cards',
+        responses: {
+          200: z.array(z.object({
+            id: z.number(),
+            queueNumber: z.number(),
+            regNumber: z.string(),
+            customerName: z.string(),
+            serviceType: z.string(),
+            brand: z.string(),
+            status: z.string(),
+            branch: z.string(),
+            isPriority: z.boolean().nullable(),
+            createdAt: z.string().nullable(),
+          })),
+        },
       },
-    },
-    delete: {
-      method: 'DELETE' as const,
-      path: '/api/jobs/:id',
-      responses: {
-        204: z.void(),
+      create: {
+        method: 'POST' as const,
+        path: '/api/v1/services/cards',
+        input: insertJobSchema,
+        responses: {
+          201: z.object({
+            id: z.number(),
+            queueNumber: z.number(),
+            regNumber: z.string(),
+            customerName: z.string(),
+            serviceType: z.string(),
+            brand: z.string(),
+            status: z.string(),
+            branch: z.string(),
+            isPriority: z.boolean().nullable(),
+            createdAt: z.string().nullable(),
+          }),
+        },
+      },
+      update: {
+        method: 'PATCH' as const,
+        path: '/api/v1/services/cards/:id',
+        input: insertJobSchema.partial(),
+        responses: {
+          200: z.object({
+            id: z.number(),
+            queueNumber: z.number(),
+            regNumber: z.string(),
+            customerName: z.string(),
+            serviceType: z.string(),
+            brand: z.string(),
+            status: z.string(),
+            branch: z.string(),
+            isPriority: z.boolean().nullable(),
+            createdAt: z.string().nullable(),
+          }),
+        },
+      },
+      delete: {
+        method: 'DELETE' as const,
+        path: '/api/v1/services/cards/:id',
+        responses: {
+          204: z.void(),
+        },
       },
     },
   },
