@@ -46,6 +46,7 @@ export default function Dashboard() {
   const { mutate: deleteJob } = useDeleteJob();
   const [searchTerm, setSearchTerm] = useState("");
 
+
   const stats = {
     checkedIn: jobs?.filter((j) => j.status === "Checked In").length || 0,
     diagnostics: jobs?.filter((j) => j.status === "In Diagnostics").length || 0,
@@ -83,21 +84,9 @@ export default function Dashboard() {
               <span className="text-xl font-bold tracking-tight font-display">AutoFlow</span>
             </div>
             
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="hidden md:flex text-white/90 hover:text-white hover:bg-white/10">
-                  CFAO Airport Branch
-                  <ChevronDown className="ml-2 h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56">
-                <DropdownMenuLabel>Switch Branch</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>CFAO Airport</DropdownMenuItem>
-                <DropdownMenuItem>CFAO Tema</DropdownMenuItem>
-                <DropdownMenuItem>CFAO Kumasi</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <Button variant="ghost" className="hidden md:flex text-white/90 hover:text-white hover:bg-white/10" disabled>
+              CFAO Airport Branch
+            </Button>
           </div>
 
           <div className="flex items-center gap-4">
@@ -112,7 +101,7 @@ export default function Dashboard() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="pl-0 text-white hover:bg-white/10 rounded-full pr-4">
                   <Avatar className="h-8 w-8 mr-2 border border-white/20">
-                    <AvatarImage src="https://github.com/shadcn.png" />
+                    <AvatarImage src="https://x.com/CFAOMobility_Ug/status/1983503788846793053" />
                     <AvatarFallback>SA</AvatarFallback>
                   </Avatar>
                   <div className="text-left hidden sm:block">
@@ -330,12 +319,6 @@ export default function Dashboard() {
               </Button>
             </div>
 
-            <div className="pt-4">
-               <Button variant="outline" className="w-full justify-start text-slate-500 hover:text-slate-900">
-                  <Settings className="mr-2 h-4 w-4" />
-                  View Admin Dashboard
-               </Button>
-            </div>
           </div>
         </div>
       </main>

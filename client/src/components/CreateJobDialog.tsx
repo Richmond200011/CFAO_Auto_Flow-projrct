@@ -1,7 +1,7 @@
 import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { insertJobSchema, type InsertJob } from "@shared/schema";
+import { formJobSchema, type FormJob } from "@shared/schema";
 import { useCreateJob } from "@/hooks/use-jobs";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,47 +28,60 @@ import { Loader2, Plus } from "lucide-react";
 
 export function CreateJobDialog() {
   const [open, setOpen] = useState(false);
-  const { mutate, isPending } = useCreateJob();
+  const { mutateAsync, isPending } = useCreateJob();
   const { toast } = useToast();
   
-  const form = useForm<InsertJob>({
-    resolver: zodResolver(insertJobSchema),
+  const form = useForm<FormJob>({
+    resolver: zodResolver(formJobSchema),
     defaultValues: {
       customerName: "",
       regNumber: "",
       serviceType: "",
+      brand: "",
       status: "Checked In",
-      branch: "CFAO Airport",
       queueNumber: 0,
       isPriority: false,
     },
   });
 
-  function onSubmit(data: InsertJob) {
-    // Auto-generate queue number for simplicity in this demo
-    // In a real app, backend would handle this
+  async function onSubmit(data: FormJob) {
+    console.log("CreateJobDialog: submit clicked", data);
+    // Derive branch from stored current user (if any), otherwise fallback
+    let branch = "CFAO Airport";
+    try {
+      const raw = localStorage.getItem("user");
+      if (raw) {
+        const user = JSON.parse(raw);
+        if (user?.branch) branch = user.branch;
+      }
+    } catch (e) {
+      // ignore
+    }
+
     const payload = {
       ...data,
+      branch,
       queueNumber: Math.floor(Math.random() * 900) + 100,
     };
-    
-    mutate(payload, {
-      onSuccess: () => {
-        setOpen(false);
-        form.reset();
-        toast({
-          title: "Job Created",
-          description: `Job for ${payload.regNumber} has been successfully created.`,
-        });
-      },
-      onError: (error) => {
-        toast({
-          title: "Error creating job",
-          description: error.message,
-          variant: "destructive",
-        });
-      },
-    });
+
+    try {
+      console.log("CreateJobDialog: calling mutateAsync", payload);
+      const result = await mutateAsync(payload);
+      console.log("CreateJobDialog: create success", result);
+      setOpen(false);
+      form.reset();
+      toast({
+        title: "Job Created",
+        description: `Job for ${payload.regNumber} has been successfully created.`,
+      });
+    } catch (err: any) {
+      console.error("CreateJobDialog: create error", err);
+      toast({
+        title: "Error creating job",
+        description: err?.message || String(err),
+        variant: "destructive",
+      });
+    }
   }
 
   return (
@@ -142,30 +155,30 @@ export function CreateJobDialog() {
               )}
             />
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="branch"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Branch</FormLabel>
-                    <FormControl>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select branch" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="CFAO Airport">CFAO Airport</SelectItem>
-                          <SelectItem value="CFAO Tema">CFAO Tema</SelectItem>
-                          <SelectItem value="CFAO Kumasi">CFAO Kumasi</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <FormField
+              control={form.control}
+              name="brand"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Vehicle Brand</FormLabel>
+                  <FormControl>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select brand" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Mitsubishi">Mitsubishi</SelectItem>
+                        <SelectItem value="Toyota">Toyota</SelectItem>
+                        <SelectItem value="Suzuki">Suzuki</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
+            <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="status"

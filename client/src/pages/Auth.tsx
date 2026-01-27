@@ -3,21 +3,34 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { Eye, EyeOff, KeyRound, Mail, MapPin } from "lucide-react";
+import { Eye, EyeOff, KeyRound, Mail } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function AuthPage() {
   const [, setLocation] = useLocation();
   const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulate auth delay
+    // Simulate auth delay and store a fake current user
     setTimeout(() => {
+      const branch =
+        email === "sarah@autoflow.com"
+          ? "CFAO Airport Workshop"
+          : email === "admin@autoflow.com"
+          ? "All Branches"
+          : "CFAO Airport";
+      const user = { username: email, branch };
+      try {
+        localStorage.setItem("user", JSON.stringify(user));
+      } catch (e) {
+        // ignore storage errors
+      }
       setLocation("/dashboard");
     }, 1500);
   };
@@ -56,7 +69,7 @@ export default function AuthPage() {
             </svg>
           </div>
           <h1 className="text-4xl font-extrabold text-white tracking-tight font-display">AutoFlow</h1>
-          <p className="text-slate-300 mt-2 font-light">Service Management Dashboard</p>
+          <p className="text-slate-300 mt-2 font-light">CFAO Mobility Management Portal</p>
         </div>
 
         <Card className="border-0 bg-white/10 backdrop-blur-xl shadow-2xl shadow-black/50 text-white">
@@ -68,30 +81,15 @@ export default function AuthPage() {
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="branch" className="text-slate-200">Branch Location</Label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
-                  <Select defaultValue="airport">
-                    <SelectTrigger className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-slate-400 focus:ring-primary focus:border-primary">
-                      <SelectValue placeholder="Select branch" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="airport">CFAO Airport</SelectItem>
-                      <SelectItem value="tema">CFAO Tema</SelectItem>
-                      <SelectItem value="kumasi">CFAO Kumasi</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="space-y-2">
                 <Label htmlFor="email" className="text-slate-200">Email Address</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
-                  <Input 
-                    id="email" 
-                    type="email" 
-                    placeholder="advisor@autoflow.com" 
+                  <Input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="advisor@autoflow.com"
                     className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-slate-400 focus-visible:ring-primary focus-visible:border-primary"
                     required
                   />
@@ -102,10 +100,12 @@ export default function AuthPage() {
                 <Label htmlFor="password" className="text-slate-200">Password</Label>
                 <div className="relative">
                   <KeyRound className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
-                  <Input 
-                    id="password" 
-                    type={showPassword ? "text" : "password"} 
-                    placeholder="••••••••" 
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
                     className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-slate-400 focus-visible:ring-primary focus-visible:border-primary"
                     required
                   />
@@ -139,15 +139,10 @@ export default function AuthPage() {
               </Button>
             </form>
           </CardContent>
-          <CardFooter className="flex flex-col gap-4 border-t border-white/10 pt-6">
-            <Button variant="outline" className="w-full bg-transparent border-white/20 text-white hover:bg-white/5 hover:text-white">
-              Create Account
-            </Button>
-          </CardFooter>
         </Card>
 
         <p className="text-center text-xs text-slate-400 mt-6">
-          &copy; 2024 AutoFlow Service Systems. All rights reserved.
+          &copy; 2026 CFAO Service Systems. All rights reserved.
         </p>
       </motion.div>
     </div>

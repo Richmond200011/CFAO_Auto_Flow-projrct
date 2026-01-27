@@ -33,6 +33,7 @@ export async function registerRoutes(
       regNumber: "GT-1234-22",
       customerName: "Aminu S.",
       serviceType: "Full Service",
+      brand: "Toyota",
       status: "In Diagnostics",
       branch: "CFAO Airport Workshop",
       isPriority: false
@@ -42,6 +43,7 @@ export async function registerRoutes(
       regNumber: "AS-5678-21",
       customerName: "Linda A.",
       serviceType: "Oil Change (Express)",
+      brand: "Mitsubishi",
       status: "Work in Progress",
       branch: "CFAO Airport Workshop",
       isPriority: true
