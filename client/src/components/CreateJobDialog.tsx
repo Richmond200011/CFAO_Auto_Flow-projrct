@@ -28,7 +28,7 @@ import { Loader2, Plus } from "lucide-react";
 
 export function CreateJobDialog() {
   const [open, setOpen] = useState(false);
-  const { mutateAsync, isPending } = useCreateJob();
+  const { mutate, isPending } = useCreateJob();
   const { toast } = useToast();
   
   const form = useForm<FormJob>({
@@ -44,7 +44,7 @@ export function CreateJobDialog() {
     },
   });
 
-  async function onSubmit(data: FormJob) {
+  function onSubmit(data: FormJob) {
     console.log("CreateJobDialog: submit clicked", data);
     // Derive branch from stored current user (if any), otherwise fallback
     let branch = "CFAO Airport";
@@ -64,24 +64,23 @@ export function CreateJobDialog() {
       queueNumber: Math.floor(Math.random() * 900) + 100,
     };
 
-    try {
-      console.log("CreateJobDialog: calling mutateAsync", payload);
-      const result = await mutateAsync(payload);
-      console.log("CreateJobDialog: create success", result);
-      setOpen(false);
-      form.reset();
-      toast({
-        title: "Job Created",
-        description: `Job for ${payload.regNumber} has been successfully created.`,
-      });
-    } catch (err: any) {
-      console.error("CreateJobDialog: create error", err);
-      toast({
-        title: "Error creating job",
-        description: err?.message || String(err),
-        variant: "destructive",
-      });
-    }
+    mutate(payload, {
+      onSuccess: () => {
+        setOpen(false);
+        form.reset();
+        toast({
+          title: "Job Created",
+          description: `Job for ${payload.regNumber} has been successfully created.`,
+        });
+      },
+      onError: (error) => {
+        toast({
+          title: "Error creating job",
+          description: error.message,
+          variant: "destructive",
+        });
+      },
+    });
   }
 
   return (

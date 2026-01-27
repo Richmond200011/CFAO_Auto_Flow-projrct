@@ -14,25 +14,35 @@ export default function AuthPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulate auth delay and store a fake current user
-    setTimeout(() => {
-      const branch =
-        email === "sarah@autoflow.com"
-          ? "CFAO Airport Workshop"
-          : email === "admin@autoflow.com"
-          ? "All Branches"
-          : "CFAO Airport";
-      const user = { username: email, branch };
-      try {
+
+    try {
+      const response = await fetch("https://58f193b812d7.ngrok-free.app/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: email,
+          password: password,
+        }),
+      });
+
+      if (response.ok) {
+        const user = await response.json();
         localStorage.setItem("user", JSON.stringify(user));
-      } catch (e) {
-        // ignore storage errors
+        setLocation("/dashboard");
+      } else {
+        alert("Invalid credentials");
       }
-      setLocation("/dashboard");
-    }, 1500);
+    } catch (error) {
+      console.error("Login error:", error);
+      alert("Login failed. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
