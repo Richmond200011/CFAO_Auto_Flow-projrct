@@ -1,14 +1,31 @@
 import { z } from "zod";
 
 export const insertJobSchema = z.object({
-  customerName: z.string().min(2, { message: "Customer name must be at least 2 characters" }),
-  regNumber: z.string().min(4, { message: "Registration number must be at least 4 characters" }),
-  serviceType: z.string({ required_error: "Please select a service type" }).min(1, { message: "Please select a service type" }),
-  brand: z.string({ required_error: "Please select a vehicle brand" }).min(1, { message: "Please select a vehicle brand" }),
+  customerName: z
+    .string()
+    .min(2, { message: "Customer name must be at least 2 characters" }),
+  customerPhone: z.string().optional(),
+  customerEmail: z
+    .string()
+    .email("Invalid email format")
+    .optional()
+    .or(z.literal("")),
+  regNumber: z
+    .string()
+    .min(4, { message: "Registration number must be at least 4 characters" }),
+  serviceType: z
+    .string({ required_error: "Please select a service type" })
+    .min(1, { message: "Please select a service type" }),
+  brand: z
+    .string({ required_error: "Please select a vehicle brand" })
+    .min(1, { message: "Please select a vehicle brand" }),
   status: z.string().min(1),
   branch: z.string().min(1),
   queueNumber: z.number().optional(),
   isPriority: z.boolean().optional(),
+  description: z.string().optional(),
+  estimatedCost: z.number().optional(),
+  estimatedDuration: z.string().optional(),
   createdAt: z.date().optional(),
 });
 
