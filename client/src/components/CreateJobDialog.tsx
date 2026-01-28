@@ -179,13 +179,17 @@ export function CreateJobDialog() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all">
-          <Plus className="mr-2 h-4 w-4" /> Add New Job
+          <Plus className="mr-2 h-4 w-4" />
+          <span className="hidden sm:inline">Add New Job</span>
+          <span className="sm:hidden">Job</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px] rounded-2xl">
-        <DialogHeader>
-          <DialogTitle className="text-xl font-bold">Add New Job</DialogTitle>
-          <DialogDescription>
+      <DialogContent className="max-w-[95vw] sm:max-w-[500px] w-full mx-4 rounded-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader className="pb-4 sm:pb-6">
+          <DialogTitle className="text-lg sm:text-xl font-bold">
+            Add New Job
+          </DialogTitle>
+          <DialogDescription className="text-sm sm:text-base">
             Enter vehicle and customer details to create a new service ticket.
           </DialogDescription>
         </DialogHeader>
@@ -193,30 +197,32 @@ export function CreateJobDialog() {
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-4 py-4"
+            className="space-y-3 sm:space-y-4 py-2 sm:py-4"
           >
             {/* Customer Selection Section */}
-            <div className="space-y-4">
-              <div className="flex items-center space-x-2">
+            <div className="space-y-3 sm:space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 space-y-2 sm:space-y-0">
                 <Button
                   type="button"
                   variant={isNewCustomer ? "default" : "outline"}
                   size="sm"
                   onClick={handleNewCustomer}
-                  className="flex-1"
+                  className="w-full sm:flex-1"
                 >
                   <User className="mr-2 h-4 w-4" />
-                  New Customer
+                  <span className="hidden sm:inline">New Customer</span>
+                  <span className="sm:hidden">New</span>
                 </Button>
                 <Button
                   type="button"
                   variant={!isNewCustomer ? "default" : "outline"}
                   size="sm"
                   onClick={() => setIsNewCustomer(false)}
-                  className="flex-1"
+                  className="w-full sm:flex-1"
                 >
                   <Search className="mr-2 h-4 w-4" />
-                  Existing Customer
+                  <span className="hidden sm:inline">Existing Customer</span>
+                  <span className="sm:hidden">Existing</span>
                 </Button>
               </div>
 
@@ -307,7 +313,7 @@ export function CreateJobDialog() {
             </div>
 
             {!isNewCustomer && selectedCustomer && (
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <FormField
                   control={form.control}
                   name="customerPhone"
@@ -346,7 +352,7 @@ export function CreateJobDialog() {
             )}
 
             {isNewCustomer && (
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <FormField
                   control={form.control}
                   name="customerPhone"
@@ -467,7 +473,7 @@ export function CreateJobDialog() {
               )}
             />
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <FormField
                 control={form.control}
                 name="estimatedCost"
@@ -503,7 +509,7 @@ export function CreateJobDialog() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <FormField
                 control={form.control}
                 name="status"
@@ -541,18 +547,19 @@ export function CreateJobDialog() {
               />
             </div>
 
-            <DialogFooter className="mt-6">
+            <DialogFooter className="mt-4 sm:mt-6 flex flex-col sm:flex-row gap-2 sm:gap-3">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setOpen(false)}
+                className="w-full sm:w-auto order-2 sm:order-1"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={isPending}
-                className="bg-primary text-white"
+                className="bg-primary text-white w-full sm:w-auto order-1 sm:order-2"
               >
                 {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Create Ticket

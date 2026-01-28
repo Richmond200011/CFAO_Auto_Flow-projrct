@@ -64,6 +64,8 @@ export default function Dashboard() {
   const { mutate: deleteJob } = useDeleteJob();
   const { mutate: createJob } = useCreateJob();
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [priorityFilter, setPriorityFilter] = useState<string>("all");
 
   console.log("statistics", statistics);
 
@@ -75,11 +77,20 @@ export default function Dashboard() {
     wip: statistics?.workInProgress || 0,
   };
 
-  const filteredJobs = jobs?.filter(
-    (job: Job) =>
+  const filteredJobs = jobs?.filter((job: Job) => {
+    const matchesSearch =
       job.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      job.regNumber.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+      job.regNumber.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesStatus = statusFilter === "all" || job.status === statusFilter;
+
+    const matchesPriority =
+      priorityFilter === "all" ||
+      (priorityFilter === "priority" && job.isPriority) ||
+      (priorityFilter === "regular" && !job.isPriority);
+
+    return matchesSearch && matchesStatus && matchesPriority;
+  });
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -108,7 +119,7 @@ export default function Dashboard() {
       {/* Header */}
       <header className="sticky top-0 z-40 w-full bg-[#1a3b8c] text-white shadow-md">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <div className="h-8 w-8 rounded-lg bg-white/10 flex items-center justify-center">
                 <Car className="h-5 w-5" />
@@ -120,14 +131,14 @@ export default function Dashboard() {
 
             <Button
               variant="ghost"
-              className="hidden md:flex text-white/90 hover:text-white hover:bg-white/10"
+              className="hidden lg:flex text-white/90 hover:text-white hover:bg-white/10"
               disabled
             >
               CFAO Airport Branch
             </Button>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
             <Button
               variant="ghost"
               size="icon"
@@ -143,19 +154,19 @@ export default function Dashboard() {
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="pl-0 text-white hover:bg-white/10 rounded-full pr-4"
+                  className="pl-0 text-white hover:bg-white/10 rounded-full pr-2 sm:pr-4"
                 >
-                  <Avatar className="h-8 w-8 mr-2 border border-white/20">
+                  <Avatar className="h-8 w-8 border border-white/20">
                     <AvatarImage src="https://x.com/CFAOMobility_Ug/status/1983503788846793053" />
                     <AvatarFallback>SA</AvatarFallback>
                   </Avatar>
-                  <div className="text-left hidden sm:block">
+                  <div className="text-left hidden md:block ml-2">
                     <p className="text-sm font-medium leading-none">
                       Sarah Jenkins
                     </p>
                     <p className="text-xs text-white/60">Service Advisor</p>
                   </div>
-                  <ChevronDown className="ml-2 h-4 w-4 text-white/60" />
+                  <ChevronDown className="ml-1 sm:ml-2 h-4 w-4 text-white/60" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
@@ -175,16 +186,16 @@ export default function Dashboard() {
 
       <main className="flex-1 container mx-auto px-4 py-8 space-y-8">
         {/* Status Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-2 sm:gap-3 lg:gap-4">
           {statsLoading ? (
             // Loading skeletons
             [...Array(5)].map((_, i) => (
               <div
                 key={i}
-                className="bg-white rounded-xl p-6 shadow-sm border border-slate-200"
+                className="bg-white rounded-xl p-3 sm:p-4 lg:p-6 shadow-sm border border-slate-200"
               >
-                <div className="h-4 w-20 bg-slate-200 rounded animate-pulse mb-3" />
-                <div className="h-8 w-12 bg-slate-200 rounded animate-pulse" />
+                <div className="h-3 w-16 bg-slate-200 rounded animate-pulse mb-2 sm:mb-3" />
+                <div className="h-6 w-10 bg-slate-200 rounded animate-pulse" />
               </div>
             ))
           ) : (
@@ -224,9 +235,9 @@ export default function Dashboard() {
         </div>
 
         {/* Main Content Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 lg:gap-8">
           {/* Left Column: Queue Table */}
-          <div className="lg:col-span-9 space-y-4">
+          <div className="xl:col-span-9 space-y-4">
             <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
               <div className="p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
@@ -237,24 +248,240 @@ export default function Dashboard() {
                     Manage vehicle status and workflow
                   </p>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="relative">
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <div className="relative w-full sm:w-auto">
                     <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
                     <Input
                       placeholder="Search reg number or name..."
-                      className="pl-9 w-[250px] bg-slate-50 border-slate-200"
+                      className="pl-9 w-full sm:w-[250px] bg-slate-50 border-slate-200"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                     />
                   </div>
-                  <Button variant="outline" size="icon">
-                    <Filter className="h-4 w-4 text-slate-600" />
-                  </Button>
-                  <CreateJobDialog />
+                  <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
+                    <Select
+                      value={statusFilter}
+                      onValueChange={setStatusFilter}
+                    >
+                      <SelectTrigger className="w-full sm:w-[140px] bg-slate-50 border-slate-200">
+                        <SelectValue placeholder="Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Status</SelectItem>
+                        <SelectItem value="checked-in">Checked In</SelectItem>
+                        <SelectItem value="in-diagnostics">
+                          In Diagnostics
+                        </SelectItem>
+                        <SelectItem value="waiting-for-parts">
+                          Waiting Parts
+                        </SelectItem>
+                        <SelectItem value="work-in-progress">
+                          Work in Progress
+                        </SelectItem>
+                        <SelectItem value="ready-for-pickup">
+                          Ready for Pickup
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select
+                      value={priorityFilter}
+                      onValueChange={setPriorityFilter}
+                    >
+                      <SelectTrigger className="w-full sm:w-[120px] bg-slate-50 border-slate-200">
+                        <SelectValue placeholder="Priority" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Priority</SelectItem>
+                        <SelectItem value="priority">Priority</SelectItem>
+                        <SelectItem value="regular">Regular</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <CreateJobDialog />
+                  </div>
                 </div>
               </div>
 
-              <div className="overflow-x-auto">
+              {/* Mobile Card View */}
+              <div className="block lg:hidden">
+                {isLoading ? (
+                  // Mobile loading skeletons
+                  <div className="space-y-3">
+                    {[...Array(5)].map((_, i) => (
+                      <div
+                        key={i}
+                        className="bg-white rounded-xl p-4 shadow-sm border border-slate-200"
+                      >
+                        <div className="flex justify-between items-start mb-3">
+                          <div className="h-4 w-16 bg-slate-200 rounded animate-pulse" />
+                          <div className="h-6 w-20 bg-slate-200 rounded-full animate-pulse" />
+                        </div>
+                        <div className="space-y-2">
+                          <div className="h-4 w-24 bg-slate-200 rounded animate-pulse" />
+                          <div className="h-4 w-32 bg-slate-200 rounded animate-pulse" />
+                          <div className="h-4 w-28 bg-slate-200 rounded animate-pulse" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : filteredJobs?.length === 0 ? (
+                  <div className="text-center py-12 text-slate-500">
+                    No jobs found matching your search.
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <AnimatePresence>
+                      {filteredJobs?.map((job: Job) => (
+                        <motion.div
+                          key={job.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -20 }}
+                          layout
+                          className="bg-white rounded-xl p-4 shadow-sm border border-slate-200 hover:shadow-md transition-shadow"
+                        >
+                          <div className="flex justify-between items-start mb-3">
+                            <div className="flex items-center gap-2">
+                              <span className="font-mono text-sm text-slate-500">
+                                #{job.queueNumber}
+                              </span>
+                              <div className="flex items-center gap-2">
+                                <span className="font-semibold text-slate-900">
+                                  {job.regNumber}
+                                </span>
+                                {job.isPriority && (
+                                  <Badge
+                                    variant="secondary"
+                                    className="bg-amber-100 text-amber-800 border-amber-200 text-xs px-1.5 py-0.5"
+                                  >
+                                    ★ Priority
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+                            <Select
+                              defaultValue={job.status}
+                              onValueChange={(val) =>
+                                updateJob(
+                                  { id: job.id, status: val },
+                                  {
+                                    onSuccess: () => {
+                                      refetchStats();
+                                    },
+                                  },
+                                )
+                              }
+                            >
+                              <SelectTrigger
+                                className={`w-[140px] h-8 border-0 shadow-sm text-xs ${getStatusColor(job.status)}`}
+                              >
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="checked-in">
+                                  Checked In
+                                </SelectItem>
+                                <SelectItem value="in-diagnostics">
+                                  In Diagnostics
+                                </SelectItem>
+                                <SelectItem value="waiting-for-parts">
+                                  Waiting for Parts
+                                </SelectItem>
+                                <SelectItem value="work-in-progress">
+                                  Work in Progress
+                                </SelectItem>
+                                <SelectItem value="ready-for-pickup">
+                                  Ready for Pickup
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          <div className="space-y-2 mb-3">
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-medium text-slate-700">
+                                Customer:
+                              </span>
+                              <span className="text-sm text-slate-900">
+                                {job.customerName}
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-medium text-slate-700">
+                                Service:
+                              </span>
+                              <Badge
+                                variant="outline"
+                                className="font-normal bg-white text-xs"
+                              >
+                                {job.serviceType}
+                              </Badge>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-medium text-slate-700">
+                                Wait Time:
+                              </span>
+                              <span className="text-sm text-slate-500">
+                                45m
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 px-3 text-blue-600 hover:bg-blue-50"
+                            >
+                              <MessageCircle className="h-4 w-4 mr-1" />
+                              Message
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 px-3 text-slate-600 hover:bg-slate-100"
+                            >
+                              <Key className="h-4 w-4 mr-1" />
+                              Keys
+                            </Button>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-8 px-3 text-slate-400 hover:text-slate-600"
+                                >
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    updateJob({
+                                      id: job.id,
+                                      isPriority: !job.isPriority,
+                                    })
+                                  }
+                                >
+                                  Toggle Priority
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  className="text-red-600"
+                                  onClick={() => deleteJob(job.id)}
+                                >
+                                  Remove Job
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
+                  </div>
+                )}
+              </div>
+
+              {/* Desktop Table View */}
+              <div className="hidden lg:block overflow-x-auto">
                 <Table>
                   <TableHeader className="bg-slate-50/50">
                     <TableRow>
@@ -314,7 +541,17 @@ export default function Dashboard() {
                               #{job.queueNumber}
                             </TableCell>
                             <TableCell className="font-semibold text-slate-900">
-                              {job.regNumber}
+                              <div className="flex items-center gap-2">
+                                {job.regNumber}
+                                {job.isPriority && (
+                                  <Badge
+                                    variant="secondary"
+                                    className="bg-amber-100 text-amber-800 border-amber-200 text-xs px-1.5 py-0.5"
+                                  >
+                                    ★ Priority
+                                  </Badge>
+                                )}
+                              </div>
                             </TableCell>
                             <TableCell>
                               <div className="flex flex-col">
@@ -430,13 +667,13 @@ export default function Dashboard() {
           </div>
 
           {/* Right Column: Info Panels */}
-          <div className="lg:col-span-3 space-y-6">
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+          <div className="xl:col-span-3 space-y-4 lg:space-y-6">
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6">
               <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
                 <Clock className="h-5 w-5 text-slate-400" />
                 Quick Info
               </h3>
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 <div className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
                   <span className="text-sm text-slate-600">Total in Queue</span>
                   <span className="font-bold text-slate-900">
@@ -476,7 +713,7 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-[#1a3b8c] to-blue-700 rounded-2xl shadow-lg shadow-blue-900/20 p-6 text-white">
+            <div className="bg-gradient-to-br from-[#1a3b8c] to-blue-700 rounded-2xl shadow-lg shadow-blue-900/20 p-4 sm:p-6 text-white">
               <h3 className="font-bold mb-4 flex items-center gap-2">
                 <div className="p-1 bg-white/20 rounded">
                   <Car className="h-4 w-4 text-white" />
@@ -515,7 +752,7 @@ export default function Dashboard() {
                     ))
                 )}
               </div>
-              <Button className="w-full mt-4 bg-white text-blue-900 hover:bg-white/90">
+              <Button className="w-full mt-4 bg-white text-blue-900 hover:bg-white/90 text-sm sm:text-base">
                 Manage Priority
               </Button>
             </div>
